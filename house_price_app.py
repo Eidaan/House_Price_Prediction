@@ -108,7 +108,7 @@ model_choice = st.sidebar.selectbox("Choose Model", ["Linear Regression", "Rando
 model = {"Linear Regression": lr_model, "Random Forest": rf_model, "Gradient Boosting": gb_model}[model_choice]
 
 # -------------------------------
-# Tabs (with first tab as User Guide)
+# Tabs
 # -------------------------------
 tabs = st.tabs([
     "📖 Welcome",
@@ -131,7 +131,7 @@ with tabs[0]:
     """)
 
 # -------------------------------
-# Tab 1: Single Prediction
+# Single Prediction Tab
 # -------------------------------
 with tabs[1]:
     with st.expander("📖 How to Use Single Prediction Tab", expanded=True):
@@ -141,36 +141,79 @@ with tabs[1]:
         - SHAP chart explains **which features increased or decreased** the prediction
         - Experiment with sliders to see interactive effect
         """)
+
     st.header("Single House Prediction")
-    
-    # Sliders
+
+    # Realistic ranges (1st to 99th percentile)
+    ranges = {
+        "MedInc": (X.MedInc.quantile(0.01), X.MedInc.quantile(0.99)),
+        "HouseAge": (X.HouseAge.quantile(0.01), X.HouseAge.quantile(0.99)),
+        "AveRooms": (X.AveRooms.quantile(0.01), X.AveRooms.quantile(0.99)),
+        "AveBedrms": (X.AveBedrms.quantile(0.01), X.AveBedrms.quantile(0.99)),
+        "Population": (X.Population.quantile(0.01), X.Population.quantile(0.99)),
+        "AveOccup": (X.AveOccup.quantile(0.01), X.AveOccup.quantile(0.99)),
+        "Latitude": (X.Latitude.min(), X.Latitude.max()),
+        "Longitude": (X.Longitude.min(), X.Longitude.max())
+    }
+
     col1, col2, col3 = st.columns(3)
+
+    # Helper function: validated number input with tooltip & warning
+    def validated_input(name, slider_val, min_val, max_val):
+        st.markdown(f"<span title='Realistic range: {round(min_val,2)} - {round(max_val,2)}'>{name}</span>", unsafe_allow_html=True)
+        val = st.number_input(
+            f"Type {name}",
+            value=float(slider_val),
+            min_value=float(min_val),
+            max_value=float(max_val),
+            format="%.4f"
+        )
+        if val < min_val or val > max_val:
+            st.warning(f"⚠️ {name} should be between {round(min_val,2)} and {round(max_val,2)}")
+        return val
+
     with col1:
-        MedInc = st.slider("Median Income (10k $)", float(X.MedInc.min()), float(X.MedInc.max()), float(X.MedInc.mean()))
-        HouseAge = st.slider("House Age", float(X.HouseAge.min()), float(X.HouseAge.max()), float(X.HouseAge.mean()))
-        AveRooms = st.slider("Average Rooms", float(X.AveRooms.min()), float(X.AveRooms.max()), float(X.AveRooms.mean()))
+        MedInc = st.slider("Median Income (10k $)", ranges["MedInc"][0], ranges["MedInc"][1], float(X.MedInc.mean()))
+        MedInc_input = validated_input("Median Income (10k $)", MedInc, *ranges["MedInc"])
+
+        HouseAge = st.slider("House Age", ranges["HouseAge"][0], ranges["HouseAge"][1], float(X.HouseAge.mean()))
+        HouseAge_input = validated_input("House Age", HouseAge, *ranges["HouseAge"])
+
+        AveRooms = st.slider("Average Rooms", ranges["AveRooms"][0], ranges["AveRooms"][1], float(X.AveRooms.mean()))
+        AveRooms_input = validated_input("Average Rooms", AveRooms, *ranges["AveRooms"])
+
     with col2:
-        AveBedrms = st.slider("Average Bedrooms", float(X.AveBedrms.min()), float(X.AveBedrms.max()), float(X.AveBedrms.mean()))
-        Population = st.slider("Population", float(X.Population.min()), float(X.Population.max()), float(X.Population.mean()))
-        AveOccup = st.slider("Average Occupancy", float(X.AveOccup.min()), float(X.AveOccup.max()), float(X.AveOccup.mean()))
+        AveBedrms = st.slider("Average Bedrooms", ranges["AveBedrms"][0], ranges["AveBedrms"][1], float(X.AveBedrms.mean()))
+        AveBedrms_input = validated_input("Average Bedrooms", AveBedrms, *ranges["AveBedrms"])
+
+        Population = st.slider("Population", ranges["Population"][0], ranges["Population"][1], float(X.Population.mean()))
+        Population_input = validated_input("Population", Population, *ranges["Population"])
+
+        AveOccup = st.slider("Average Occupancy", ranges["AveOccup"][0], ranges["AveOccup"][1], float(X.AveOccup.mean()))
+        AveOccup_input = validated_input("Average Occupancy", AveOccup, *ranges["AveOccup"])
+
     with col3:
-        Latitude = st.slider("Latitude", float(X.Latitude.min()), float(X.Latitude.max()), float(X.Latitude.mean()))
-        Longitude = st.slider("Longitude", float(X.Longitude.min()), float(X.Longitude.max()), float(X.Longitude.mean()))
-    
+        Latitude = st.slider("Latitude", ranges["Latitude"][0], ranges["Latitude"][1], float(X.Latitude.mean()))
+        Latitude_input = validated_input("Latitude", Latitude, *ranges["Latitude"])
+
+        Longitude = st.slider("Longitude", ranges["Longitude"][0], ranges["Longitude"][1], float(X.Longitude.mean()))
+        Longitude_input = validated_input("Longitude", Longitude, *ranges["Longitude"])
+
+    # Input dataframe
     input_df = pd.DataFrame({
-        'MedInc':[MedInc],
-        'HouseAge':[HouseAge],
-        'AveRooms':[AveRooms],
-        'AveBedrms':[AveBedrms],
-        'Population':[Population],
-        'AveOccup':[AveOccup],
-        'Latitude':[Latitude],
-        'Longitude':[Longitude],
-        'RoomsPerHousehold':[AveRooms/AveOccup],
-        'BedroomsPerRoom':[AveBedrms/AveRooms],
-        'PopulationPerHousehold':[Population/AveOccup]
+        'MedInc':[MedInc_input],
+        'HouseAge':[HouseAge_input],
+        'AveRooms':[AveRooms_input],
+        'AveBedrms':[AveBedrms_input],
+        'Population':[Population_input],
+        'AveOccup':[AveOccup_input],
+        'Latitude':[Latitude_input],
+        'Longitude':[Longitude_input],
+        'RoomsPerHousehold':[AveRooms_input/AveOccup_input],
+        'BedroomsPerRoom':[AveBedrms_input/AveRooms_input],
+        'PopulationPerHousehold':[Population_input/AveOccup_input]
     })
-    
+
     if st.button("Predict"):
         prediction = model.predict(input_df)[0]
         st.markdown(f"""
@@ -179,13 +222,14 @@ with tabs[1]:
             <h1 style='color:#FFD700;'>${round(prediction*100000,2)}</h1>
         </div>
         """, unsafe_allow_html=True)
-        
+
         explainer = shap.Explainer(model, X)
         shap_values = explainer(input_df)
         st.subheader("Feature Contributions (SHAP)")
         shap.plots.bar(shap_values, show=False)
         st.pyplot(plt.gcf())
         plt.clf()
+
 
 # -------------------------------
 # Tab 2: Batch Prediction
@@ -205,6 +249,12 @@ with tabs[2]:
     uploaded_file = st.file_uploader("Upload CSV with house features", type=["csv"], key="batch")
     if uploaded_file is not None:
         batch_df = pd.read_csv(uploaded_file)
+
+        # Clip inputs to realistic ranges
+        for col, (min_val, max_val) in ranges.items():
+            if col in batch_df.columns:
+                batch_df[col] = batch_df[col].clip(min_val, max_val)
+
         st.subheader("Processing Predictions...")
         progress = st.progress(0)
         predictions = []
