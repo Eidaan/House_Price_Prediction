@@ -35,14 +35,6 @@ Built with **scikit-learn** for the ML model and **Streamlit** for an interactiv
 
 📸 **Screenshot**  
 
-![Demo Screenshot](demo.png)  
+![Demo Screenshot](https://raw.githubusercontent.com/Eidaan/House_Price_Prediction/refs/heads/main/demo1.png)  
 
----
 
-## ⚡ How to Run  
-
-Clone the repository:  
-
-```bash
-git clone https://github.com/YourUsername/House-Price-Prediction
-cd House-Price-Prediction
