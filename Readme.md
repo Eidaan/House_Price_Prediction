@@ -35,6 +35,6 @@ Built with **scikit-learn** for the ML model and **Streamlit** for an interactiv
 
 📸 **Screenshot**  
 
-![Demo Screenshot](https://raw.githubusercontent.com/Eidaan/House_Price_Prediction/refs/heads/main/demo1.png)  
+![Demo Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/105504116/487252691-67a8b1fe-508d-4ad1-a68a-950888232dd5.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250909%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250909T111630Z&X-Amz-Expires=300&X-Amz-Signature=587c8469e39bb279284f61d10cf3665034416e181d35b99b14c790ce41579286&X-Amz-SignedHeaders=host)  
 
 
